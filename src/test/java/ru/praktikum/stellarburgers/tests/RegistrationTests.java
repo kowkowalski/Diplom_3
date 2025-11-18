@@ -1,39 +1,45 @@
 package ru.praktikum.stellarburgers.tests;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.junit4.DisplayName;
 import org.junit.Test;
-import ru.praktikum.stellarburgers.pages.*;
+import ru.praktikum.stellarburgers.pages.HomePage;
+import ru.praktikum.stellarburgers.pages.LoginPage;
+import ru.praktikum.stellarburgers.pages.RegistrationPage;
 
 import static org.junit.Assert.assertTrue;
 
 public class RegistrationTests extends BaseTest {
 
     @Test
+    @DisplayName("Успешная регистрация")
+    @Description("Создаём нового пользователя → логинимся → проверяем загрузку главной страницы.")
     public void successfulRegistration() {
+
+        String newEmail = "ui_" + System.currentTimeMillis() + "@mail.ru";
+        String newPassword = "123456";
+
         HomePage home = new HomePage(driver);
         home.openMainPage();
 
         LoginPage login = home.clickLoginButton();
         RegistrationPage reg = login.clickRegistrationLink();
 
+        // Успешная регистрация — ждём страницу логина
+        reg.register("Автотест", newEmail, newPassword);
 
-        String randomEmail = "autotest_" + System.currentTimeMillis() + "@mail.ru";
+        login.enterEmail(newEmail);
+        login.enterPassword(newPassword);
 
-        reg.enterName("Автотест");
-        reg.enterEmail(randomEmail);
-        reg.enterPassword("123456");
+        HomePage afterLogin = login.clickLogin();
 
-        login = reg.clickRegisterButton();
-
-
-        LoginPage loginAfterReg = login;
-        loginAfterReg.enterEmail(randomEmail);
-        loginAfterReg.enterPassword("123456");
-
-        HomePage homeAfterLogin = loginAfterReg.clickLogin();
-        assertTrue(homeAfterLogin.isOnMainPage());
+        assertTrue("Главная после регистрации не открылась",
+                afterLogin.isOnMainPage());
     }
 
     @Test
+    @DisplayName("Ошибка при коротком пароле")
+    @Description("Проверяем отображение ошибки при пароле < 6 символов.")
     public void wrongPasswordRegistrationShowsError() {
         HomePage home = new HomePage(driver);
         home.openMainPage();
@@ -42,12 +48,15 @@ public class RegistrationTests extends BaseTest {
         RegistrationPage reg = login.clickRegistrationLink();
 
         reg.enterName("Test");
-        reg.enterEmail("wrongemail@mail.com");
-        reg.enterPassword("123"); // слишком короткий пароль
+        reg.enterEmail("wrong@mail.com");
+        reg.enterPassword("123");
 
-        reg.clickRegisterButton();
+        // ⚠ Используем специальный метод без ожиданий
+        reg.clickRegisterButtonRaw();
 
-        assertTrue("Ожидалось сообщение об ошибке",
-                reg.isPasswordErrorVisible());
+        assertTrue(
+                "Ошибка 'Некорректный пароль' должна отображаться",
+                reg.isPasswordErrorVisible()
+        );
     }
 }

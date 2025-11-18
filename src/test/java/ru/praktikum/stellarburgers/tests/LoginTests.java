@@ -1,5 +1,7 @@
 package ru.praktikum.stellarburgers.tests;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.junit4.DisplayName;
 import org.junit.Test;
 import ru.praktikum.stellarburgers.pages.ForgotPasswordPage;
 import ru.praktikum.stellarburgers.pages.HomePage;
@@ -10,75 +12,63 @@ import static org.junit.Assert.assertTrue;
 
 public class LoginTests extends BaseTest {
 
-
-    private final String EMAIL = "kowkowkowalski@yandex.ru";
-    private final String PASSWORD = "Nutella2025!";
-
     @Test
+    @DisplayName("Логин через кнопку «Войти в аккаунт»")
+    @Description("Создаём пользователя через API → логинимся через главную страницу.")
     public void loginViaMainButton() {
         HomePage home = new HomePage(driver);
         home.openMainPage();
 
         LoginPage login = home.clickLoginButton();
-        login.enterEmail(EMAIL);
-        login.enterPassword(PASSWORD);
+        login.login(email, password);
 
-        HomePage homeAfterLogin = login.clickLogin();
-
-        assertTrue("Профиль не открылся после логина через кнопку на главной",
-                homeAfterLogin.isOnMainPage());
+        assertTrue("Главная страница не открылась после логина",
+                home.isOnMainPage());
     }
 
     @Test
-    public void loginViaPersonalAccountButton() {
+    @DisplayName("Логин через кнопку «Личный кабинет»")
+    @Description("Переходим в ЛК → вводим данные → логинимся.")
+    public void loginViaPersonalAccount() {
         HomePage home = new HomePage(driver);
         home.openMainPage();
 
         LoginPage login = home.clickPersonalAccount();
-        login.enterEmail(EMAIL);
-        login.enterPassword(PASSWORD);
+        login.login(email, password);
 
-        HomePage homeAfterLogin = login.clickLogin();
-
-        assertTrue("Профиль не открылся после логина через «Личный кабинет»",
-                homeAfterLogin.isOnMainPage());
+        assertTrue("Главная страница не открылась после логина",
+                home.isOnMainPage());
     }
 
     @Test
+    @DisplayName("Логин через форму регистрации")
+    @Description("Переходим в регистрацию → затем в логин → логинимся.")
     public void loginViaRegistrationFormLink() {
         HomePage home = new HomePage(driver);
         home.openMainPage();
 
         LoginPage login = home.clickLoginButton();
-        RegistrationPage registrationPage = login.clickRegistrationLink();
+        RegistrationPage reg = login.clickRegistrationLink();
+        LoginPage againLogin = reg.clickLoginLink();
 
-        LoginPage loginAgain = registrationPage.clickLoginLink();
+        againLogin.login(email, password);
 
-        loginAgain.enterEmail(EMAIL);
-        loginAgain.enterPassword(PASSWORD);
-
-        HomePage homeAfterLogin = loginAgain.clickLogin();
-
-        assertTrue("Профиль не открылся после логина через форму регистрации",
-                homeAfterLogin.isOnMainPage());
+        assertTrue("Главная страница не открылась после логина", home.isOnMainPage());
     }
 
     @Test
+    @DisplayName("Логин через форму восстановления пароля")
+    @Description("Переходим в восстановление → обратно в логин → логинимся.")
     public void loginViaForgotPasswordForm() {
         HomePage home = new HomePage(driver);
         home.openMainPage();
 
         LoginPage login = home.clickLoginButton();
-        ForgotPasswordPage forgotPasswordPage = login.clickForgotPasswordLink();
+        ForgotPasswordPage forgot = login.clickForgotPasswordLink();
+        LoginPage againLogin = forgot.clickLoginLink();
 
-        LoginPage loginAgain = forgotPasswordPage.clickLoginLink();
+        againLogin.login(email, password);
 
-        loginAgain.enterEmail(EMAIL);
-        loginAgain.enterPassword(PASSWORD);
-
-        HomePage homeAfterLogin = loginAgain.clickLogin();
-
-        assertTrue("Профиль не открылся после логина через форму восстановления пароля",
-                homeAfterLogin.isOnMainPage());
+        assertTrue("Главная страница не открылась после логина", home.isOnMainPage());
     }
 }

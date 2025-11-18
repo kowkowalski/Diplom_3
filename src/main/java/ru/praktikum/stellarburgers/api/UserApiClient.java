@@ -1,38 +1,58 @@
 package ru.praktikum.stellarburgers.api;
 
-import io.restassured.RestAssured;
-import io.restassured.response.Response;
+import io.restassured.http.ContentType;
 
-public class ApiClient {
+import static io.restassured.RestAssured.given;
+
+public class UserApiClient {
 
     private static final String BASE_URL = "https://stellarburgers.education-services.ru";
 
-    public ApiClient() {
-        RestAssured.baseURI = BASE_URL;
+    public static class UserData {
+        public String email;
+        public String password;
+        public String name;
+
+        public UserData(String email, String password, String name) {
+            this.email = email;
+            this.password = password;
+            this.name = name;
+        }
     }
 
+    // Создание пользователя
+    public static String createUser(String email, String password, String name) {
+        UserData body = new UserData(email, password, name);
 
-    public Response createUser(String email, String password, String name) {
-        String body = String.format("""
-                {
-                  "email": "%s",
-                  "password": "%s",
-                  "name": "%s"
-                }
-                """, email, password, name);
-
-        return RestAssured
-                .given()
-                .header("Content-type", "application/json")
+        String token = given()
+                .baseUri(BASE_URL)
+                .contentType(ContentType.JSON)
                 .body(body)
-                .post("/api/auth/register");
+                .when()
+                .post("/api/auth/register")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("accessToken");
+
+        // Удаляем "Bearer " если сервер его вернул
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+
+        return token;
     }
 
+    // Удаление пользователя
+    public static void deleteUser(String accessToken) {
+        if (accessToken == null) return;
 
-    public Response deleteUser(String token) {
-        return RestAssured
-                .given()
-                .header("Authorization", token)
-                .delete("/api/auth/user");
+        given()
+                .baseUri(BASE_URL)
+                .header("Authorization", "Bearer " + accessToken)
+                .when()
+                .delete("/api/auth/user")
+                .then()
+                .statusCode(202); // API реально возвращает 202
     }
 }

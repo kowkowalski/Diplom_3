@@ -41,7 +41,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- SLF4J implementation -->
+        <!-- SLF4J -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
@@ -69,30 +69,30 @@
             <version>${allure.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>io.qameta.allure</groupId>
-            <artifactId>allure-java-commons</artifactId>
-            <version>${allure.version}</version>
-        </dependency>
-
     </dependencies>
 
     <build>
         <plugins>
 
-            <!-- Surefire + Allure integration -->
+            <!-- Surefire + Allure listener -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
                 <configuration>
+                    <properties>
+                        <property>
+                            <name>listener</name>
+                            <value>io.qameta.allure.junit4.AllureJunit4</value>
+                        </property>
+                    </properties>
                     <systemPropertyVariables>
                         <allure.results.directory>target/allure-results</allure.results.directory>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
 
-            <!-- Allure commandline (генератор отчётов) -->
+            <!-- Allure CLI (allure:report, allure:serve) -->
             <plugin>
                 <groupId>io.qameta.allure</groupId>
                 <artifactId>allure-maven</artifactId>
