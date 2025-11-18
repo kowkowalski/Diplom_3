@@ -1,4 +1,4 @@
-# IntelliJ
+# IntelliJ IDEA
 .idea/
 *.iml
 
@@ -8,9 +8,12 @@
 # OS
 .DS_Store
 
-# Build output
+# Build output and Maven target folder
 target/
 !target/allure-results/
+
+# Exclude Allure CLI (should NOT be committed)
+.allure/
 
 # Maven wrapper
 !.mvn/wrapper/maven-wrapper.jar
@@ -22,3 +25,9 @@ target/
 .classpath
 .project
 .settings/
+
+# NetBeans
+nbproject/
+nbbuild/
+dist/
+.nb-gradle/
