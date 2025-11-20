@@ -7,17 +7,23 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class LoginPage extends BasePage {
 
-    // --- Локаторы ---
+
     private final By loginHeader = By.xpath("//h2[text()='Вход']");
+
     private final By emailInput = By.xpath("//label[text()='Email']/following-sibling::input");
     private final By passwordInput = By.xpath("//label[text()='Пароль']/following-sibling::input");
     private final By loginButton = By.xpath("//button[text()='Войти']");
+
     private final By registrationLink = By.xpath("//a[text()='Зарегистрироваться']");
     private final By forgotPasswordLink = By.xpath("//a[text()='Восстановить пароль']");
+
+
+    private final By mainPageHeader = By.xpath("//h1[text()='Соберите бургер']");
 
     public LoginPage(WebDriver driver) {
         super(driver);
     }
+
 
     @Step("Проверяем, что открыта страница логина")
     public boolean isLoginPageOpened() {
@@ -38,10 +44,8 @@ public class LoginPage extends BasePage {
     public HomePage clickLogin() {
         click(loginButton);
 
-        // Ждём переход на главную
-        wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.xpath("//h1[text()='Соберите бургер']")
-        ));
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(mainPageHeader));
 
         return new HomePage(driver);
     }

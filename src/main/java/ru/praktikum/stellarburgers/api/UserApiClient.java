@@ -1,5 +1,6 @@
 package ru.praktikum.stellarburgers.api;
 
+import io.qameta.allure.Step;
 import io.restassured.http.ContentType;
 
 import static io.restassured.RestAssured.given;
@@ -20,11 +21,11 @@ public class UserApiClient {
         }
     }
 
-    // Создание пользователя
+    @Step("Создаём пользователя через API: {email}")
     public static String createUser(String email, String password, String name) {
         UserData body = new UserData(email, password, name);
 
-        String token = given()
+        return given()
                 .baseUri(BASE_URL)
                 .contentType(ContentType.JSON)
                 .body(body)
@@ -34,25 +35,18 @@ public class UserApiClient {
                 .statusCode(200)
                 .extract()
                 .path("accessToken");
-
-        // Удаляем "Bearer " если сервер его вернул
-        if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7);
-        }
-
-        return token;
     }
 
-    // Удаление пользователя
+    @Step("Удаляем пользователя через API")
     public static void deleteUser(String accessToken) {
         if (accessToken == null) return;
 
         given()
                 .baseUri(BASE_URL)
-                .header("Authorization", "Bearer " + accessToken)
+                .header("Authorization", accessToken)
                 .when()
                 .delete("/api/auth/user")
                 .then()
-                .statusCode(202); // API реально возвращает 202
+                .statusCode(202);
     }
 }
